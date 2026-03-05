@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
-import logoImage from '../assets/FREEZKO logo .webp'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -61,18 +60,15 @@ export default function LoginPage() {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{
-            width: 96, height: 96, borderRadius: 16,
+            width: 64, height: 64, borderRadius: 16,
+            background: 'linear-gradient(135deg, var(--accent), var(--accent-2))',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px',
-            overflow: 'hidden',
-            background: 'var(--bg-3)',
-            border: '2px solid var(--border)',
-          }}>
-            <img src={logoImage} alt="FREEZKO" style={{ width: '150%', height: '150%', objectFit: 'contain' }} />
-          </div>
-          <h1 style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em' }}>FREEZKO Manger</h1>
+            fontSize: 28, margin: '0 auto 16px',
+            boxShadow: '0 0 40px var(--accent-glow)',
+          }}>❄</div>
+          <h1 style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em' }}>فريزكو</h1>
           <p style={{ color: 'var(--text-3)', fontSize: 13, marginTop: 6, letterSpacing: '0.08em' }}>
-            Cold Storage Warehouse Manager
+            مدير مستودع التبريد
           </p>
         </div>
 
@@ -92,10 +88,10 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div className="form-group">
-              <label>البريد الإلكتروني</label>
+              <label>عنوان البريد الإلكتروني</label>
               <input
                 type="email"
-                placeholder="you@company.com"
+                placeholder="أنت@الشركة.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -122,42 +118,14 @@ export default function LoginPage() {
             >
               {loading ? (
                 <><div className="spinner" style={{ width: 16, height: 16 }} /> جاري التسجيل...</>
-              ) : 'تسجيل الدخول'}
+              ) : 'تسجيل دخول'}
             </button>
           </form>
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: 'var(--text-3)' }}>
-          تواصل مع المسؤول إذا كنت بحاجة إلى الوصول.
+          تواصل مع المسؤول إذا كنت تحتاج للوصول.
         </p>
-        
-        <div style={{ textAlign: 'center', marginTop: 12 }}>
-          <a 
-            href="tel:01007731844"
-            style={{
-              display: 'inline-block',
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--accent-2)',
-              textDecoration: 'none',
-              padding: '8px 16px',
-              borderRadius: 'var(--radius-sm)',
-              border: '1px solid var(--accent-2)',
-              transition: 'all 0.2s',
-              cursor: 'pointer',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(0,212,170,0.1)';
-              e.currentTarget.style.color = 'var(--accent-2)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = 'var(--accent-2)';
-            }}
-          >
-            الاتصال بالمسؤول
-          </a>
-        </div>
       </div>
     </div>
   )

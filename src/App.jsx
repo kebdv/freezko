@@ -3,10 +3,13 @@ import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
+import WelcomePage from './pages/WelcomePage'
 import DashboardPage from './pages/DashboardPage'
 import ClientsPage from './pages/ClientsPage'
+import ClientDetailPage from './pages/ClientDetailPage'
 import OperationsPage from './pages/OperationsPage'
 import InventoryPage from './pages/InventoryPage'
+import ScanPage from './pages/ScanPage'
 
 function ProtectedRoute({ user, children }) {
   if (!user) return <Navigate to="/login" replace />
@@ -16,6 +19,7 @@ function ProtectedRoute({ user, children }) {
 export default function App() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [showWelcome, setShowWelcome] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -23,7 +27,11 @@ export default function App() {
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setShowWelcome(true)
+        setTimeout(() => setShowWelcome(false), 3000)
+      }
       setUser(session?.user ?? null)
     })
 
@@ -38,6 +46,10 @@ export default function App() {
     )
   }
 
+  if (showWelcome && user) {
+    return <WelcomePage user={user} onDone={() => setShowWelcome(false)} />
+  }
+
   return (
     <BrowserRouter>
       <Routes>
@@ -49,8 +61,10 @@ export default function App() {
         }>
           <Route index element={<DashboardPage />} />
           <Route path="clients" element={<ClientsPage />} />
+          <Route path="clients/:id" element={<ClientDetailPage />} />
           <Route path="operations" element={<OperationsPage />} />
           <Route path="inventory" element={<InventoryPage />} />
+          <Route path="scan" element={<ScanPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
