@@ -1,9 +1,11 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
+import { useLanguage } from '../LanguageContext'
 
 export default function Layout({ user }) {
   const navigate = useNavigate()
+  const { t, isRTL, toggleLanguage, lang } = useLanguage()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
 
@@ -14,11 +16,11 @@ export default function Layout({ user }) {
   }, [])
 
   const navItems = [
-    { path: '/', label: 'لوحة التحكم', icon: '⬡', exact: true },
-    { path: '/clients', label: 'العملاء', icon: '◈' },
-    { path: '/operations', label: 'العمليات', icon: '⇅' },
-    { path: '/inventory', label: 'المخزون', icon: '▦' },
-    ...(isMobile ? [{ path: '/scan', label: 'مسح الآن', icon: '▣', mobile: true }] : []),
+    { path: '/', label: t.dashboard, icon: '⬡', exact: true },
+    { path: '/clients', label: t.clients, icon: '◈' },
+    { path: '/operations', label: t.operations, icon: '⇅' },
+    { path: '/inventory', label: t.inventory, icon: '▦' },
+    ...(isMobile ? [{ path: '/scan', label: t.scanNow, icon: '▣', mobile: true }] : []),
   ]
 
   async function handleLogout() {
@@ -29,21 +31,26 @@ export default function Layout({ user }) {
   const displayName = user.user_metadata?.full_name || user.email.split('@')[0]
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row-reverse', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', direction: isRTL ? 'rtl' : 'ltr' }}>
       {sidebarOpen && isMobile && (
         <div onClick={() => setSidebarOpen(false)} style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 99,
         }} />
       )}
 
+      {/* Sidebar */}
       <aside style={{
         width: 'var(--sidebar-w)',
         background: 'var(--bg-2)',
-        borderLeft: '1px solid var(--border)',
+        borderRight: isRTL ? 'none' : '1px solid var(--border)',
+        borderLeft: isRTL ? '1px solid var(--border)' : 'none',
         display: 'flex', flexDirection: 'column', flexShrink: 0, zIndex: 100,
         ...(isMobile ? {
-          position: 'fixed', top: 0, right: 0, bottom: 0,
-          transform: sidebarOpen ? 'translateX(0)' : 'translateX(100%)',
+          position: 'fixed', top: 0,
+          right: isRTL ? 0 : 'auto',
+          left: isRTL ? 'auto' : 0,
+          bottom: 0,
+          transform: sidebarOpen ? 'translateX(0)' : (isRTL ? 'translateX(100%)' : 'translateX(-100%)'),
           transition: 'transform 0.25s ease',
         } : {}),
       }}>
@@ -57,10 +64,25 @@ export default function Layout({ user }) {
               fontSize: 16, color: '#fff', flexShrink: 0,
             }}>❄</div>
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14, color: 'var(--text)', letterSpacing: '-0.02em' }}>فريزكو</div>
-              <div style={{ fontSize: 10, color: 'var(--text-3)', letterSpacing: '0.1em' }}>مدير المستودع</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14, color: 'var(--text)', letterSpacing: '-0.02em' }}>COLDSTORE</div>
+              <div style={{ fontSize: 10, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t.appSubtitle}</div>
             </div>
           </div>
+
+          {/* Language toggle */}
+          <button onClick={toggleLanguage} style={{
+            marginTop: 12, width: '100%',
+            background: 'var(--bg-3)', border: '1px solid var(--border)',
+            color: 'var(--accent)', borderRadius: 'var(--radius-sm)',
+            padding: '7px 10px', fontSize: 12, fontWeight: 700,
+            cursor: 'pointer', fontFamily: lang === 'ar' ? 'var(--font)' : 'var(--font-mono)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            transition: 'all 0.15s', letterSpacing: lang === 'en' ? '0.05em' : 0,
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'var(--accent-glow)' }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg-3)' }}>
+            🌐 {t.switchLanguage}
+          </button>
         </div>
 
         {/* Nav */}
@@ -78,10 +100,10 @@ export default function Layout({ user }) {
                 border: isActive ? '1px solid rgba(59,158,255,0.2)' : (item.mobile ? '1px solid rgba(0,212,170,0.2)' : '1px solid transparent'),
               })}
             >
-              <span style={{ fontSize: 16, opacity: 0.9 }}>{item.icon}</span>
+              <span style={{ fontSize: 16 }}>{item.icon}</span>
               {item.label}
               {item.mobile && (
-                <span style={{ marginLeft: 'auto', fontSize: 10, background: 'var(--accent-2)', color: '#000', padding: '2px 6px', borderRadius: 10, fontWeight: 700 }}>
+                <span style={{ marginInlineStart: 'auto', fontSize: 10, background: 'var(--accent-2)', color: '#000', padding: '2px 6px', borderRadius: 10, fontWeight: 700 }}>
                   MOBILE
                 </span>
               )}
@@ -102,7 +124,7 @@ export default function Layout({ user }) {
               <div style={{ fontSize: 12, color: 'var(--text)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {displayName}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{user.email}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
             </div>
           </div>
           <button onClick={handleLogout} style={{
@@ -114,14 +136,13 @@ export default function Layout({ user }) {
           }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--danger)'; e.currentTarget.style.color = 'var(--danger)' }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)' }}>
-            ⏻ تسجيل خروج
+            ⏻ {t.signOut}
           </button>
         </div>
       </aside>
 
       {/* Main */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {/* Topbar mobile */}
         {isMobile && (
           <header style={{
             height: 'var(--topbar-h)', background: 'var(--bg-2)',
@@ -134,7 +155,17 @@ export default function Layout({ user }) {
             }}>☰</button>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 18 }}>❄</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14 }}>فريزكو</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14 }}>COLDSTORE</span>
+            </div>
+            <div style={{ marginInlineStart: 'auto' }}>
+              <button onClick={toggleLanguage} style={{
+                background: 'var(--bg-3)', border: '1px solid var(--border)',
+                color: 'var(--accent)', borderRadius: 'var(--radius-sm)',
+                padding: '5px 10px', fontSize: 11, fontWeight: 700,
+                cursor: 'pointer', fontFamily: 'var(--font)',
+              }}>
+                🌐 {t.switchLanguage}
+              </button>
             </div>
           </header>
         )}

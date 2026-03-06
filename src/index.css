@@ -25,11 +25,9 @@
   --radius: 10px;
   --radius-sm: 6px;
   --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  --font: 'Cairo', sans-serif;
+  --font: 'DM Sans', sans-serif;
   --font-mono: 'Space Mono', monospace;
 }
-
-html { direction: rtl; }
 
 html { height: 100%; }
 
@@ -357,13 +355,11 @@ tbody tr:hover {
 
 .search-bar input {
   padding-left: 36px;
-  padding-right: 36px;
 }
 
 .search-bar .search-icon {
   position: absolute;
-  right: 12px;
-  left: auto;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-3);
@@ -371,7 +367,136 @@ tbody tr:hover {
   pointer-events: none;
 }
 
-/* Table alignment for RTL */
-th, td {
-  text-align: right;
+/* ===== RTL / LTR Support ===== */
+[dir="rtl"] .search-bar .search-icon { left: auto; right: 12px; }
+[dir="rtl"] .search-bar input { padding-left: 14px; padding-right: 36px; }
+[dir="rtl"] .modal-close { margin-left: auto; }
+[dir="rtl"] th, [dir="rtl"] td { text-align: right; }
+[dir="ltr"] th, [dir="ltr"] td { text-align: left; }
+
+/* ===== Full Responsive ===== */
+@media (max-width: 768px) {
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .page-header .btn { width: 100%; justify-content: center; }
+  .card { padding: 16px; }
+  .modal { padding: 20px; }
+  .modal-footer { flex-direction: column; }
+  .modal-footer .btn { width: 100%; justify-content: center; }
+  table { font-size: 13px; }
+  th, td { padding: 10px 12px; }
+
+  /* Hide less important columns on mobile */
+  .hide-mobile { display: none !important; }
+
+  /* Card view for tables on mobile */
+  .mobile-cards table,
+  .mobile-cards thead,
+  .mobile-cards tbody,
+  .mobile-cards th,
+  .mobile-cards td,
+  .mobile-cards tr { display: block; }
+  .mobile-cards thead tr { display: none; }
+  .mobile-cards tr {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    padding: 12px;
+  }
+  .mobile-cards td {
+    padding: 5px 0;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+  .mobile-cards td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    margin-inline-end: 10px;
+  }
+  .table-wrapper { border: none; background: transparent; }
+}
+
+@media (max-width: 480px) {
+  :root { --sidebar-w: 260px; }
+  h1.page-title { font-size: 18px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr !important; }
+  main { padding: 12px !important; }
+  .btn { font-size: 13px; padding: 8px 14px; }
+}
+
+/* Lang toggle button */
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-3);
+  color: var(--text-2);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.lang-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ==========================================
+   RESPONSIVE — Mobile Cards & Tables
+   ========================================== */
+
+/* Mobile card layout */
+.mobile-cards { display: none; flex-direction: column; gap: 12px; }
+.mobile-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.mobile-card:active { border-color: var(--accent); }
+
+.desktop-table { display: block; }
+
+@media (max-width: 768px) {
+  .mobile-cards { display: flex; }
+  .desktop-table { display: none; }
+
+  .grid-2, .grid-3 { grid-template-columns: 1fr !important; }
+
+  .page-title { font-size: 18px; }
+
+  .card { padding: 16px; }
+
+  .modal { padding: 20px; margin: 10px; max-width: calc(100vw - 20px) !important; }
+
+  table { font-size: 13px; }
+  th, td { padding: 10px 12px; }
+
+  /* Scrollable tables on mobile */
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .search-bar { max-width: 100% !important; }
+
+  .btn { font-size: 13px; padding: 8px 14px; }
+}
+
+@media (max-width: 480px) {
+  main { padding: 12px !important; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .ops-grid { grid-template-columns: 1fr !important; }
 }
